@@ -165,23 +165,35 @@ RUN git clone https://github.com/YosysHQ/nextpnr nextpnr && \
     make install
 
 
-#linux-on-litex-vexriscv
+####### linux-on-litex-vexriscv ####################################
+
+
+
+RUN apt-get install -y \
+    build-essential device-tree-compiler wget git python3-setuptools
+
+USER $USER
+
+
 RUN mkdir -p $WORKDIR/tools/litex 
 WORKDIR $WORKDIR/tools/litex
 
-RUN apt-get install -y \
-    build-essential device-tree-compiler wget git python3-setuptools && \
-    git clone https://github.com/enjoy-digital/linux-on-litex-vexriscv
+RUN git clone https://github.com/enjoy-digital/linux-on-litex-vexriscv
 
 # litex, required python 3.6+
 RUN wget https://raw.githubusercontent.com/enjoy-digital/litex/master/litex_setup.py && \
     chmod +x litex_setup.py && \
-    ./litex_setup.py init && \
-    sudo ./litex_setup.py install
+    ./litex_setup.py init
+    
+USER root
+RUN sudo ./litex_setup.py install
 
 # buildroot
-RUN apt-get install -y \
+RUN sudo apt-get install -y \
     cpio rsync
+
+USER $USER
+
 RUN git clone http://github.com/buildroot/buildroot buildroot && \
     cd buildroot && \
     make BR2_EXTERNAL=../linux-on-litex-vexriscv/buildroot/ litex_vexriscv_defconfig  &&\
@@ -190,3 +202,20 @@ RUN git clone http://github.com/buildroot/buildroot buildroot && \
 # or use prebuilt version
 # RUN  git clone https://github.com/enjoy-digital/linux-on-litex-vexriscv-prebuilt &&\
 #      cp -r linux-on-litex-vexriscv-prebuilt/* linux-on-litex-vexriscv
+
+####### copy files ####################################
+
+USER root
+COPY ./files/non5Gversion.diff $WORKDIR
+RUN chown -R $USER $WORKDIR/non5Gversion.diff
+
+####### Startup Script ####################################
+
+USER root
+WORKDIR /
+# run the startup script each time the container is created
+COPY ./startup.sh /opt
+RUN chmod +x /opt/startup.sh
+ENTRYPOINT ["/opt/startup.sh"]
+
+
