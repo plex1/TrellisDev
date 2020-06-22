@@ -188,9 +188,10 @@ RUN wget https://raw.githubusercontent.com/enjoy-digital/litex/master/litex_setu
 USER root
 RUN sudo ./litex_setup.py install
 
-# buildroot
+####### buildroot ####################################
+
 RUN sudo apt-get install -y \
-    cpio rsync
+    cpio rsync libncurses-dev
 
 USER $USER
 
@@ -206,8 +207,9 @@ RUN git clone http://github.com/buildroot/buildroot buildroot && \
 ####### copy files ####################################
 
 USER root
-COPY ./files/non5Gversion.diff $WORKDIR
-RUN chown -R $USER $WORKDIR/non5Gversion.diff
+COPY ./files/LFE5UM.diff $WORKDIR
+RUN chown -R $USER $WORKDIR/LFE5UM.diff
+
 
 ####### Startup Script ####################################
 

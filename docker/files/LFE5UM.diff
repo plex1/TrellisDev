@@ -1,0 +1,14 @@
+diff --git a/make.py b/make.py
+index 89eb0cf..1a03066 100755
+--- a/make.py
++++ b/make.py
+@@ -359,6 +359,8 @@ def main():
+         if "ethernet" in board.soc_capabilities:
+             soc_kwargs.update(with_ethernet=True)
+ 
++        soc_kwargs.update(device="LFE5UM")
++
+         # SoC creation -----------------------------------------------------------------------------
+         soc = SoCLinux(board.soc_cls, **soc_kwargs)
+         board.platform = soc.platform
+
